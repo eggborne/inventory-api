@@ -1,0 +1,265 @@
+openapi: 3.0.0
+info:
+  title: Inventory API
+  description: API for managing inventory items, listings, and sales.
+  version: 1.0.0
+servers:
+  - url: 'https://mikedonovan.dev/inventory-api'
+    variables:
+      protocol:
+        default: http
+      host:
+        default: localhost
+      port:
+        default: '3000'
+paths:
+  /items:
+    get:
+      operationId: getItems
+      summary: Get a list of items
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+        - in: query
+          name: fullName
+          schema:
+            type: string
+        - in: query
+          name: shortName
+          schema:
+            type: string
+        - in: query
+          name: description
+          schema:
+            type: string
+        - in: query
+          name: buyDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: boughtFor
+          schema:
+            type: integer
+        - in: query
+          name: source
+          schema:
+            type: string
+        - in: query
+          name: condition
+          schema:
+            type: string
+        - in: query
+          name: suggestedValue
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: An array of items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    post:
+      operationId: createItem
+      summary: Create a new item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: New item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+  /listings:
+    get:
+      operationId: getListings
+      summary: Get a list of listings
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+        - in: query
+          name: sellVenue
+          schema:
+            type: string
+        - in: query
+          name: listDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: listPrice
+          schema:
+            type: integer
+        - in: query
+          name: sellPrice
+          schema:
+            type: integer
+        - in: query
+          name: sellDate
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: An array of listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Listing'
+    post:
+      operationId: createListing
+      summary: Create a new listing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Listing'
+      responses:
+        '201':
+          description: New listing created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Listing'
+  /sales:
+    get:
+      operationId: getSales
+      summary: Get a list of sales
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+        - in: query
+          name: saleDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: salePrice
+          schema:
+            type: integer
+        - in: query
+          name: buyerContact
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An array of sales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sale'
+    post:
+      operationId: createSale
+      summary: Create a new sale
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sale'
+      responses:
+        '201':
+          description: New sale created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+components:
+  schemas:
+    Item:
+      type: object
+      required: [fullName, shortName, buyDate, boughtFor, source, condition]
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        fullName:
+          type: string
+          maxLength: 255
+        shortName:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+          maxLength: 255
+          nullable: true
+        buyDate:
+          type: string
+          format: date
+        boughtFor:
+          type: integer
+        source:
+          type: string
+          maxLength: 255
+        condition:
+          type: string
+          maxLength: 255
+        suggestedValue:
+          type: integer
+          nullable: true
+    Listing:
+      type: object
+      required: [sellVenue, listDate, listPrice]
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        itemId:
+          type: integer
+          format: int64
+        sellVenue:
+          type: string
+          maxLength: 255
+        listDate:
+          type: string
+          format: date
+        listPrice:
+          type: integer
+        sellPrice:
+          type: integer
+          nullable: true
+        sellDate:
+          type: string
+          format: date
+          nullable: true
+    Sale:
+      type: object
+      required: [saleDate, salePrice]
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        listingId:
+          type: integer
+          format: int64
+        saleDate:
+          type: string
+          format: date
+        salePrice:
+          type: integer
+        buyerContact:
+          type: string
+          maxLength: 255
+          nullable: true
